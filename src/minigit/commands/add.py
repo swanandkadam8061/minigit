@@ -24,18 +24,14 @@ def configure(parser: argparse.ArgumentParser) -> None:
 def run(args: argparse.Namespace, repo: Repository | None) -> int:
     assert repo is not None
     index = Index.load(repo)
-    staged_anything = False
     for raw in args.paths:
-        staged_anything = _stage_deletions(index, repo, raw) or staged_anything
+        _stage_deletions(index, repo, raw)
         if not Path(raw).exists():
             continue
         for path in _expand(repo, raw):
             sha = write_object(repo, (repo.worktree / path).read_bytes(), "blob")
             index.add(IndexEntry(FILE_MODE, sha, path))
-            staged_anything = True
     index.save(repo)
-    if staged_anything:
-        print("Files have reached the staging area.")
     return 0
 
 
@@ -55,7 +51,6 @@ def _stage_deletions(index, repo, raw):
         index.remove(path)
     if not deleted and not Path(raw).exists():
         raise MinigitError(f"pathspec '{raw}' did not match any files")
-    return bool(deleted)
 
 
 def _expand(repo, raw):

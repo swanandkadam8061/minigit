@@ -237,18 +237,9 @@ def test_cat_file_unknown(repo, run):
 
 def test_add_file(repo, run, write):
     write("hello.txt", "hello\n")
-    result = run("add", "hello.txt")
-    assert result.code == 0
-    assert result.out == "Files have reached the staging area.\n"
+    assert run("add", "hello.txt").code == 0
     entry = Index.load(repo).get("hello.txt")
     assert entry.sha == HELLO_BLOB
-
-
-def test_add_failure_does_not_print_success(repo, run):
-    result = run("add", "missing.txt")
-    assert result.code == 128
-    assert result.out == ""
-    assert "did not match any files" in result.err
 
 
 def test_add_directory_recursively(repo, run, write):

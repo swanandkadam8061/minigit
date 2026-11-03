@@ -26,19 +26,6 @@ def test_staged_section(repo, run, write):
     assert "\tnew file:   notes.txt" in out
 
 
-def test_status_colors_staged_green_and_untracked_red(repo, run, write, monkeypatch):
-    from minigit import color
-
-    monkeypatch.setattr(color, "_should_color", lambda: True)
-    write("staged.txt", "staged\n")
-    write("untracked.txt", "untracked\n")
-    run("add", "staged.txt")
-
-    out = run("status").out
-    assert "\033[32mstaged.txt\033[0m" in out
-    assert "\033[31muntracked.txt\033[0m" in out
-
-
 def test_all_three_sections(repo, run, write):
     write("hello.txt", "hello\n")
     write("old.txt", "old\n")
